@@ -1,0 +1,13 @@
+name: Slackbot Release Notification
+author: Harm Matthias Harms
+runs:
+  using: node20
+  main: dist/index.js
+description: Post release notes to a slack channel.
+branding:
+  color: blue
+  icon: book
+inputs:
+  slack_webhook_url:
+    required: true
+    description: "The webhook URL for the Slack channel"
