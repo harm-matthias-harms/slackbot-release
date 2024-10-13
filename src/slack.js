@@ -1,4 +1,4 @@
-import { markdownToBlocks } from '@instantish/mack'
+import { markdownToBlocks } from '@tryfabric/mack'
 
 export async function notify (slackWebhookUrl, release, repo) {
   const intro = {

@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { notify } from './slack'
 
-async function run () {
+export async function run () {
   try {
     if (github.context.eventName !== 'release') {
       core.info('Action should only be run on release publish event!')
