@@ -8,6 +8,6 @@ branding:
   color: blue
   icon: book
 inputs:
-  slack_webhook_url:
+  slack-webhook-url:
     required: true
     description: "The webhook URL for the Slack channel"
