@@ -1,0 +1,23 @@
+{
+  "name": "slackbot-release",
+  "description": "GitHub action for slack notifications of releases",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build ./src/index.js -m",
+    "test": "vitest --coverage",
+    "lint": "standard"
+  },
+  "dependencies": {
+    "@actions/core": "1.11.1",
+    "@actions/github": "6.0.0",
+    "@tryfabric/mack": "1.2.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "0.38.2",
+    "@vitest/coverage-v8": "2.1.2",
+    "standard": "17.1.2",
+    "vitest": "2.1.2"
+  }
+}
