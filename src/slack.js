@@ -5,7 +5,7 @@ export async function notify (slackWebhookUrl, release, repo) {
     type: 'header',
     text: {
       type: 'plain_text',
-      text: `🎉 [${repo.owner}/${repo.name}]: ${release.name}`
+      text: `🎉 [${repo.owner}/${repo.repo}]: ${release.name}`
     }
   }
   const link = {
