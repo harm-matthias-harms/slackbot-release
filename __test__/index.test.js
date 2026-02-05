@@ -12,7 +12,9 @@ describe('run', () => {
     release = { name: 'Test Release', html_url: 'https://example.com/release' }
     repo = { owner: 'test-owner', name: 'test-repo' }
 
-    vi.spyOn(core, 'getInput').mockReturnValue(slackWebhookUrl)
+
+    vi.mock('@actions/core', { spy: true })
+    vi.mocked(core.getInput).mockReturnValue(slackWebhookUrl)
     vi.spyOn(github.context, 'eventName', 'get').mockReturnValue('release')
     vi.spyOn(github.context, 'repo', 'get').mockReturnValue(repo)
     vi.spyOn(github.context, 'payload', 'get').mockReturnValue({ release })
