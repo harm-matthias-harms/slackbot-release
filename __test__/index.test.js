@@ -12,7 +12,6 @@ describe('run', () => {
     release = { name: 'Test Release', html_url: 'https://example.com/release' }
     repo = { owner: 'test-owner', name: 'test-repo' }
 
-
     vi.mock('@actions/core', { spy: true })
     vi.mocked(core.getInput).mockReturnValue(slackWebhookUrl)
     vi.spyOn(github.context, 'eventName', 'get').mockReturnValue('release')
