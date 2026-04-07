@@ -20,4 +20,6 @@ export async function run () {
   }
 }
 
-run()
+if (process.argv[1] === new URL(import.meta.url).pathname) {
+  run()
+}

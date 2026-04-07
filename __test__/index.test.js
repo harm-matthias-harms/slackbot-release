@@ -1,25 +1,43 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { run } from '../src/index'
-import * as slack from '../src/slack'
+import { notify } from '../src/slack'
 
-vi.mock('@actions/core', { spy: true })
+vi.mock('@actions/core', () => {
+  return {
+    getInput: vi.fn(),
+    setFailed: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    debug: vi.fn()
+  }
+})
+
+vi.mock('@actions/github', () => {
+  return {
+    context: {
+      eventName: 'release',
+      repo: { owner: 'test-owner', name: 'test-repo' },
+      payload: { release: { name: 'Test Release', html_url: 'https://example.com/release', body: 'Test body' } }
+    }
+  }
+})
+
+vi.mock('../src/slack', () => {
+  return {
+    notify: vi.fn()
+  }
+})
 
 describe('run', () => {
-  let slackWebhookUrl, release, repo, notifySpy
+  let slackWebhookUrl
 
   beforeEach(() => {
     slackWebhookUrl = 'https://example.com/slack-webhook'
-    release = { name: 'Test Release', html_url: 'https://example.com/release' }
-    repo = { owner: 'test-owner', name: 'test-repo' }
-
     vi.mocked(core.getInput).mockReturnValue(slackWebhookUrl)
-    vi.spyOn(github.context, 'eventName', 'get').mockReturnValue('release')
-    vi.spyOn(github.context, 'repo', 'get').mockReturnValue(repo)
-    vi.spyOn(github.context, 'payload', 'get').mockReturnValue({ release })
-    vi.spyOn(core, 'info').mockImplementation(() => { })
-    notifySpy = vi.spyOn(slack, 'notify')
+    vi.mocked(notify).mockResolvedValue({ ok: true })
   })
 
   afterEach(() => {
@@ -28,21 +46,25 @@ describe('run', () => {
 
   describe('when event is a release', () => {
     it('should call notify', async () => {
-      notifySpy.mockResolvedValue({ ok: true })
+      vi.mocked(notify).mockResolvedValue({ ok: true })
 
       await run()
 
-      expect(notifySpy).toHaveBeenCalledTimes(1)
+      expect(vi.mocked(notify)).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('when event is not a release', () => {
     beforeEach(() => {
-      vi.spyOn(github.context, 'eventName', 'get').mockReturnValue('push')
+      vi.mocked(github.context).eventName = 'push'
+    })
+
+    afterEach(() => {
+      vi.mocked(github.context).eventName = 'release'
     })
 
     it('when event is not a release', async () => {
-      const infoSpy = vi.spyOn(core, 'info')
+      const infoSpy = vi.mocked(core.info)
 
       await run()
 
@@ -50,22 +72,24 @@ describe('run', () => {
     })
 
     it('should not call notify', async () => {
-      notifySpy.mockResolvedValue({ ok: true })
+      vi.mocked(notify).mockClear()
 
       await run()
 
-      expect(notifySpy).not.toHaveBeenCalled()
+      expect(vi.mocked(notify)).not.toHaveBeenCalled()
     })
   })
 
   describe('when notify throws an error', () => {
     it('should set failed', async () => {
       const error = new Error('Notify error')
-      const setFailedSpy = vi.spyOn(core, 'setFailed')
+      const setFailedSpy = vi.mocked(core.setFailed)
+      const notifySpy = vi.mocked(notify)
       notifySpy.mockRejectedValue(error)
 
       await run()
 
+      expect(notifySpy).toHaveBeenCalledTimes(1)
       expect(setFailedSpy).toHaveBeenCalledTimes(1)
       expect(setFailedSpy).toHaveBeenCalledWith(error.message)
     })
