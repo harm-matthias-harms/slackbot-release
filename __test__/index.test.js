@@ -4,7 +4,7 @@ import * as github from '@actions/github'
 import { run } from '../src/index'
 import * as slack from '../src/slack'
 
-vi.mock('@actions/core')
+vi.mock('@actions/core', { spy: true })
 
 describe('run', () => {
   let slackWebhookUrl, release, repo, notifySpy
